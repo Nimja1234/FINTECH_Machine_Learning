@@ -38,15 +38,16 @@ class ML_Model:
         
     @classmethod
     def read_csv(self, filename):
-        self.data = pd.read_csv(filename)      
+        self.data = pd.read_csv(filename)
+        self.data.drop(columns=['Unnamed: 0'], inplace=True)
         return None
     
     @classmethod
     def create_lag(self, lag):
         # Creating lagged returns for the model
         for col in self.data.columns:
-            if col not in ['timestamp', 'JETS']:
-                self.data[f'{col}_lag_{lag}'] = self.data[col].shift(lag)
+            if col not in ['timestamp']:
+                self.data[f'{col}_lag_{lag}'] = self.data[col].shift(-1*lag)
         self.data = self.data.dropna()
         
         self.data.set_index('timestamp', inplace=True)
@@ -54,9 +55,15 @@ class ML_Model:
         return None
     
     @classmethod
+    def create_target(self):
+        self.data['JETS_T+1'] = self.data['JETS'].shift(1)
+        self.data = self.data.dropna()
+        return None
+    
+    @classmethod
     def train_test_split(self):
-        X = self.data.drop(columns=['JETS'])
-        y = self.data['JETS']
+        X = self.data.drop(columns=['JETS_T+1'])
+        y = self.data['JETS_T+1']
         
         # Split data into training and testing sets, validation set 80%
         split = int(len(X) * 0.8)

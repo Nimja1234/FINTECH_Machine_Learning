@@ -23,6 +23,7 @@ def main():
     model = ML_Model()
     model.read_csv(filename)
     model.create_lag(5)
+    model.create_target()
     model.train_test_split()
     model.scaler()
     model.build_model()
