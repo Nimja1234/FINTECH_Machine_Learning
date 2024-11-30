@@ -1,5 +1,5 @@
 # FINTECH Group Machine Learning Project
-Using historical returns and volatility to predict future volatility for Airline equities
+Using historical returns and volatility to predict future volatility for AAPL
 
 # Before Using:
 ## Install venv and install packages:
