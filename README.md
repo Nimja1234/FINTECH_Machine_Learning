@@ -9,8 +9,11 @@ Using historical returns and volatility to predict future volatility for Airline
 - pip install -r requirements.txt
 ```
 
-## To use
+## Prepare Dependent Files:
+- Create a file called equity_data
+- Put files given by professor into equity_data
+
+# To use
 ```python
 - python3 main.py
 ```
-- Start and End dates defaults are October if none inputted

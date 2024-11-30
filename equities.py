@@ -24,7 +24,7 @@ def get_volatility(file):
     dates = df.iloc[0, 1:].values
     # Extract the times and values from the remaining rows
     times = df.iloc[1:, 0].values
-    values = df.iloc[1:, 1:].values
+    values = df.iloc[1:, 1:].astype(float).values
     
     vol_file = 'equity_data/volatility.csv'
     
@@ -36,7 +36,7 @@ def get_volatility(file):
         for i, date in enumerate(dates):
             for j, time in enumerate(times):
                 if "09:30:00" <= time <= "16:00:00" and (time.endswith(":00:00") or time.endswith(":30:00")):
-                    csvwriter.writerow([f"{date} {time}", values[j, i]])
+                    csvwriter.writerow([f"{date} {time}", values[j, i]**.5])
 
     return vol_file
 

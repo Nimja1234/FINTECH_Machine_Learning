@@ -93,11 +93,14 @@ class ML_Model:
         X = self.data.drop(columns=['Volatility_T+1'])
         y = self.data['Volatility_T+1']
         
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=False)
         return None
     
     @classmethod
     def scaler(self):
+        self.y_train_index = self.y_train.index
+        self.y_test_index = self.y_test.index
+
         self.scaler_X = StandardScaler()
         self.X_train = self.scaler_X.fit_transform(self.X_train)
         self.X_test = self.scaler_X.transform(self.X_test)
@@ -128,7 +131,7 @@ class ML_Model:
                             batch_size=128, 
                             validation_split=0.2, 
                             callbacks=[early_stopping],
-                            verbose=1)
+                            verbose=0)
         return None
     
     @classmethod   
@@ -138,24 +141,6 @@ class ML_Model:
     
     @classmethod
     def show_performance(self):
-        # Plot training & validation loss values
-        plt.plot(self.history.history['mse'])
-        plt.plot(self.history.history['val_mse'])
-        plt.title('Model Mean Squared Error')
-        plt.ylabel('MSE')
-        plt.xlabel('Epoch')
-        plt.legend(['Train', 'Test'], loc='upper left')
-        plt.show()
-
-        # Plot training & validation loss values
-        plt.plot(self.history.history['loss'])
-        plt.plot(self.history.history['val_loss'])
-        plt.title('Model loss')
-        plt.ylabel('Loss')
-        plt.xlabel('Epoch')
-        plt.legend(['Train', 'Test'], loc='upper left')
-        plt.show()
-
         # Predict the values for X_test
         self.y_pred = self.model.predict(self.X_test)
 
@@ -163,12 +148,20 @@ class ML_Model:
         self.y_test_inv = self.scaler_y.inverse_transform(self.y_test)
         self.y_pred_inv = self.scaler_y.inverse_transform(self.y_pred)
 
+        # Reassign the DateTime index
+        self.y_test_inv = pd.DataFrame(self.y_test_inv, index=self.y_test_index, columns=['y_test_inv'])
+        self.y_pred_inv = pd.DataFrame(self.y_pred_inv, index=self.y_test_index, columns=['y_pred_inv'])
+        
+        # Calculate the Mean Squared Error
+        self.mse = mean_squared_error(self.y_test_inv, self.y_pred_inv)
+        print(f'Mean Squared Error: {self.mse}')
+        
         # Line graph of y_test vs y_pred values
-        plt.plot(self.y_test_inv, label='Actual Values')
-        plt.plot(self.y_pred_inv, label='Predicted Values')
-        plt.xlabel('Index')
-        plt.ylabel('Values')
-        plt.title('Actual vs Predicted Values')
+        plt.plot(self.y_test_inv.index, self.y_test_inv['y_test_inv'], label='Actual Values')
+        plt.plot(self.y_pred_inv.index, self.y_pred_inv['y_pred_inv'], label='Predicted Values')
+        plt.xlabel('Date-Time')
+        plt.ylabel('Volatility')
+        plt.title('Actual Vol. vs Predicted Vol.')
         plt.legend()
         plt.show()
 
