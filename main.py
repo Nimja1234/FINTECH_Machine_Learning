@@ -1,4 +1,3 @@
-from YFinance_Data_Aggregator import collect_data_for_stocks, save_to_csv
 from ML_Model import ML_Model
 from equities import merge_data
 

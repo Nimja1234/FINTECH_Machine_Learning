@@ -11,6 +11,7 @@ from tensorflow.keras.regularizers import l1_l2
 from sklearn.metrics import mean_squared_error
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, r2_score
 
 def save_to_csv(df, filename):
     if df is None or df.empty:
@@ -71,12 +72,12 @@ class ML_Model:
                 self.data[f'{col}_lag_{lag}'] = self.data[col].shift(-1*lag)
         self.data = self.data.dropna()
         
-        noise = np.random.normal(1, 0.04, self.data.shape[0])
-        self.data[f'returns_lag_{lag}_noisy'] = self.data[f'returns_lag_{lag}'] + noise
-        self.data[f'return_noisy'] = self.data['returns'] + noise
-        self.data[f'volaility_lag_{lag}_noisy'] = self.data[f'Volatility_lag_{lag}'] + noise
-        self.data[f'volatility_noisy'] = self.data['Volatility'] + noise
-        self.data = self.data.dropna()
+        # noise = np.random.normal(1, 0.04, self.data.shape[0])
+        # self.data[f'returns_lag_{lag}_noisy'] = self.data[f'returns_lag_{lag}'] + noise
+        # self.data[f'return_noisy'] = self.data['returns'] + noise
+        # self.data[f'volaility_lag_{lag}_noisy'] = self.data[f'Volatility_lag_{lag}'] + noise
+        # self.data[f'volatility_noisy'] = self.data['Volatility'] + noise
+        # self.data = self.data.dropna()
         
         self.data.set_index('DateTime', inplace=True)
         return None
@@ -155,6 +156,14 @@ class ML_Model:
         # Calculate the Mean Squared Error
         self.mse = mean_squared_error(self.y_test_inv, self.y_pred_inv)
         print(f'Mean Squared Error: {self.mse}')
+        
+        # Calculate the Mean Absolute Error
+        self.mae = mean_absolute_error(self.y_test_inv, self.y_pred_inv)
+        print(f'Mean Absolute Error: {self.mae}')
+        
+        # Calculate the R^2 value
+        self.r2 = r2_score(self.y_test_inv, self.y_pred_inv)
+        print(f'R^2 Value: {self.r2}')
         
         # Line graph of y_test vs y_pred values
         plt.plot(self.y_test_inv.index, self.y_test_inv['y_test_inv'], label='Actual Values')
