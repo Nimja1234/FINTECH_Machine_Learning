@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import seaborn as sns
 import os
 import random
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -166,11 +167,50 @@ class ML_Model:
         print(f'R^2 Value: {self.r2}')
         
         # Line graph of y_test vs y_pred values
+        plt.figure(figsize=(10, 6))
         plt.plot(self.y_test_inv.index, self.y_test_inv['y_test_inv'], label='Actual Values')
         plt.plot(self.y_pred_inv.index, self.y_pred_inv['y_pred_inv'], label='Predicted Values')
         plt.xlabel('Date-Time')
         plt.ylabel('Volatility')
         plt.title('Actual Vol. vs Predicted Vol.')
+        plt.legend()
+        plt.show()
+
+        # Residual plot
+        residuals = self.y_test_inv['y_test_inv'] - self.y_pred_inv['y_pred_inv']
+        plt.figure(figsize=(10, 6))
+        plt.scatter(self.y_pred_inv['y_pred_inv'], residuals)
+        plt.axhline(y=0, color='r', linestyle='--')
+        plt.xlabel('Predicted Values')
+        plt.ylabel('Residuals')
+        plt.title('Residual Plot')
+        plt.show()
+
+        # Histogram of residuals
+        plt.figure(figsize=(10, 6))
+        sns.histplot(residuals, kde=True)
+        plt.xlabel('Residuals')
+        plt.title('Histogram of Residuals')
+        plt.show()
+
+        # Scatter plot of actual vs predicted values
+        plt.figure(figsize=(10, 6))
+        plt.scatter(self.y_test_inv['y_test_inv'], self.y_pred_inv['y_pred_inv'])
+        plt.plot([self.y_test_inv['y_test_inv'].min(), self.y_test_inv['y_test_inv'].max()], 
+                 [self.y_test_inv['y_test_inv'].min(), self.y_test_inv['y_test_inv'].max()], 
+                 color='r', linestyle='--')
+        plt.xlabel('Actual Values')
+        plt.ylabel('Predicted Values')
+        plt.title('Actual vs Predicted Values')
+        plt.show()
+
+        # Learning curves
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.history.history['loss'], label='Training Loss')
+        plt.plot(self.history.history['val_loss'], label='Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title('Learning Curves')
         plt.legend()
         plt.show()
 
