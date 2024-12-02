@@ -70,7 +70,7 @@ class ML_Model:
         # Creating lagged returns for the model
         for col in self.data.columns:
             if col not in ['DateTime']:
-                self.data[f'{col}_lag_{lag}'] = self.data[col].shift(-1*lag)
+                self.data[f'{col}_lag_{lag}'] = self.data[col].shift(lag)
         self.data = self.data.dropna()
         
         # noise = np.random.normal(1, 0.04, self.data.shape[0])
@@ -85,7 +85,7 @@ class ML_Model:
     
     @classmethod
     def create_target(self):
-        self.data['Volatility_T+1'] = self.data['Volatility'].shift(1)
+        self.data['Volatility_T+1'] = self.data['Volatility'].shift(-1)
         self.data = self.data.dropna()
         save_to_csv(self.data, "ML_data.csv")
         return None
